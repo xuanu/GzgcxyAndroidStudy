@@ -13,13 +13,13 @@
         android:layout_height="match_parent"></androidx.viewpager.widget.ViewPager>
 
 
-    <ImageView
+    <views.zeffect.cn.darklib.DarkImage
         android:id="@+id/sel_city_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginTop="16dp"
         android:layout_marginRight="16dp"
-        android:src="@drawable/ic_add_city_icon"></ImageView>
+        android:src="@drawable/slt_add_city_icon"></views.zeffect.cn.darklib.DarkImage>
 
 </RelativeLayout>

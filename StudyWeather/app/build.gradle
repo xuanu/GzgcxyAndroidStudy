@@ -42,4 +42,6 @@ dependencies {
     implementation 'com.amap.api:location:3.3.0' // 高德定位
     implementation 'com.zhy:okhttputils:2.6.2'   //OKHttpUtils
     implementation("com.squareup.okhttp3:okhttp:3.3.1") //OkHttp
+
+    implementation 'com.github.xuanu:DarkViews:v1.3'
 }

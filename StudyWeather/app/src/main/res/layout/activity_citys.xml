@@ -6,11 +6,12 @@
 
 
     <RelativeLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <views.zeffect.cn.darklib.DarkText
+            android:id="@+id/back_btn"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_arrow_back_black_24dp"
@@ -18,7 +19,17 @@
             android:gravity="center_vertical"
             android:padding="8dp"
             android:text="选择城市"
-            android:textColor="#212121"></TextView>
+            android:textColor="#212121"></views.zeffect.cn.darklib.DarkText>
+
+
+        <views.zeffect.cn.darklib.DarkImage
+            android:id="@+id/add_city_img"
+            android:layout_centerVertical="true"
+            android:padding="16dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_add_black_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></views.zeffect.cn.darklib.DarkImage>
 
 
     </RelativeLayout>
