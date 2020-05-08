@@ -1,23 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.zeffect.apk.teacher.gzgcxyandroidstudy">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="cn.zeffect.apk.jump.myapplication2">
+
+
+    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 
     <application
+        tools:replace="android:icon"
+        android:name=".MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".unit27.Main27Activity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".unit25.MainActivity">
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        </activity>
+
+        <service android:name=".unit26.TestService"></service>
+
+
+        <activity android:name=".unit28.BroadcastActivity">
+
+        </activity>
+
+        <activity
+            android:name=".unit25.PagerActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+
+        <activity android:name=".unit27.WelcomeActivity">
+
+        </activity>
+
+        <activity android:name=".unit27.MainActivity"></activity>
+        <activity android:name=".unit27.CityActivity"></activity>
+        <activity android:name=".unit29.ServiceActivity">
+
+        </activity>
+
+        <service android:name=".unit29.TestService"></service>
+
+        <activity android:name=".untit30.BroadActivity">
+
+        </activity>
+        <receiver android:name=".untit30.TestReceiver">
+            <intent-filter>
+                <action android:name="zeffect.cn.test.1"></action>
+                <action android:name="zeffect.cn.test.2"></action>
+                <action android:name="zeffect.cn.test.3"></action>
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".unit31.PermissionActivity">
+
+        </activity>
+
+        <activity android:name=".unit32.AsyncActivity">
+
+        </activity>
+
+        <activity android:name=".unit33.ProgressActivity">
+
+
+        </activity>
+
+        <activity android:name=".unit34.FileActivity">
+
+        </activity>
+
+        <activity android:name=".unit35.SpActivity">
+
+        </activity>
+
+        <activity android:name=".unit36.LiteActivity">
+
+        </activity>
+
+        <activity android:name=".unit37.ContactsActivity">
+
+        </activity>
+
+        <activity android:name=".unit38.HttpActivity">
+
+        </activity>
+
+        <activity android:name=".unit39.DialogActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+                <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </activity>
-        <activity android:name=".unit27.WecomeActivity"></activity>
-        <activity android:name=".unit27.LoactionActivity"></activity>
+
     </application>
 
 </manifest>
