@@ -4,22 +4,24 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +31,9 @@ import androidx.fragment.app.DialogFragment;
 import cn.zeffect.apk.teacher.studyweather.MyApp;
 import cn.zeffect.apk.teacher.studyweather.R;
 import cn.zeffect.apk.teacher.studyweather.city.bean.CityModel;
-import okhttp3.Call;
 import okhttp3.Response;
 
-public class CityChoseDialog extends DialogFragment {
+public class CityChoseDialog extends DialogFragment implements AdapterView.OnItemSelectedListener {
 
     @Override
     public void onStart() {
@@ -50,6 +51,9 @@ public class CityChoseDialog extends DialogFragment {
     }
 
     private Spinner provinceSp;
+    private Spinner citySp, countySp;
+    private List<String> provinceList;
+    private List<String> cityList;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -57,8 +61,11 @@ public class CityChoseDialog extends DialogFragment {
         getDialog().requestWindowFeature(STYLE_NO_TITLE);
 
         provinceSp = view.findViewById(R.id.province_sp);
-
-
+        citySp = view.findViewById(R.id.city_sp);
+        countySp = view.findViewById(R.id.county_sp);
+        provinceSp.setOnItemSelectedListener(this);
+        citySp.setOnItemSelectedListener(this);
+        //
         new AsyncTask<Void, Void, List<String>>() {
             private ProgressDialog dialog;
 
@@ -144,12 +151,105 @@ public class CityChoseDialog extends DialogFragment {
             @Override
             protected void onPostExecute(List<String> aVoid) {
                 super.onPostExecute(aVoid);
-                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, aVoid);
+                provinceList = aVoid;
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.item_spinner_item, aVoid);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 provinceSp.setAdapter(adapter);
                 if (dialog != null) {
                     dialog.cancel();
                 }
             }
         }.execute();
+    }
+
+    /**
+     * 用来存储当前选择了哪个省
+     */
+    private String selectProvince;
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (parent == provinceSp) {
+            String provinceName = provinceList.get(position);
+            selectProvince = provinceName;
+            loadCity(provinceName);
+        } else if (parent == citySp) {
+            String cityName = cityList.get(position);
+            loadCounty(selectProvince, cityName);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        //什么都没做
+    }
+
+
+    private void loadCounty(String province, String cityName) {
+        if (TextUtils.isEmpty(cityName)
+                | TextUtils.isEmpty(province)) {
+            return;
+        }
+        new AsyncTask<String, Void, List<String>>() {
+            @Override
+            protected List<String> doInBackground(String... strings) {
+                String province = strings[0];
+                String city = strings[1];
+                //查询县的时候，要把省的名字和市的名字传过来。
+                QueryBuilder builder = new QueryBuilder(CityModel.class)
+                        .whereEquals(CityModel.COL_PROVINCE, province)
+                        .whereAppendAnd()
+                        .whereEquals(CityModel.COL_CITY, city);
+                List<CityModel> cityModels = MyApp.getLiteOrm().query(builder);
+                List<String> countyList = new ArrayList<>(cityModels.size());
+                for (int i = 0; i < cityModels.size(); i++) {
+                    CityModel cityModel = cityModels.get(i);
+                    countyList.add(cityModel.getDistrict());
+                }
+                return countyList;
+            }
+
+            @Override
+            protected void onPostExecute(List<String> cityModels) {
+                super.onPostExecute(cityModels);
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.item_spinner_item, cityModels);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                countySp.setAdapter(adapter);
+            }
+        }.execute(province, cityName);
+
+    }
+
+
+    private void loadCity(String province) {
+        if (TextUtils.isEmpty(province)) {
+            return;
+        }
+        new AsyncTask<String, Void, List<String>>() {
+            @Override
+            protected List<String> doInBackground(String... voids) {
+                String province = voids[0];
+                QueryBuilder builder = new QueryBuilder<>(CityModel.class).whereEquals(CityModel.COL_PROVINCE, province);
+                List<CityModel> cityModels = MyApp.getLiteOrm().query(builder);
+                List<String> cityList = new ArrayList<>();
+                for (int i = 0; i < cityModels.size(); i++) {
+                    CityModel cityModel = cityModels.get(i);
+                    String cityName = cityModel.getCity();
+                    if (!cityList.contains(cityName)) {
+                        cityList.add(cityName);
+                    }
+                }
+                return cityList;
+            }
+
+            @Override
+            protected void onPostExecute(List<String> strings) {
+                super.onPostExecute(strings);
+                cityList = strings;
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.item_spinner_item, cityList);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                citySp.setAdapter(adapter);
+            }
+        }.execute(province);
     }
 }
