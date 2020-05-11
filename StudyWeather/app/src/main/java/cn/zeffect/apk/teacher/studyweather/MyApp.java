@@ -14,7 +14,7 @@ public class MyApp extends Application {
         super.onCreate();
         if (liteOrm == null) {
             liteOrm = LiteOrm.newSingleInstance(this, "zeffect.db");
-            liteOrm.setDebugged(BuildConfig.DEBUG);
+            liteOrm.setDebugged(true);
         }
     }
 

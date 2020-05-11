@@ -52,6 +52,8 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
 
     private Spinner provinceSp;
     private Spinner citySp, countySp;
+    private List<CityModel> provinceModels; //用来存放所有的省市县
+    private List<CityModel> mCityModels;
     private List<String> provinceList;
     private List<String> cityList;
 
@@ -112,24 +114,47 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                                 JSONObject provinceJson = chinaArray.optJSONObject(i);
                                 String province = provinceJson.optString("name");
                                 JSONArray cityArray = provinceJson.optJSONArray("districts");
+                                //
+                                CityModel provinceModel = new CityModel();
+                                provinceModel.setCityCode("");
+                                provinceModel.setAdCode(provinceJson.optString("adcode"));
+                                provinceModel.setName(provinceJson.optString("name"));
+                                provinceModel.setCenterPoint(provinceJson.optString("center"));
+                                provinceModel.setLevel(provinceJson.optString("level"));
+
+                                ArrayList<CityModel> cityModels = new ArrayList<>(cityArray.length());
+                                //
                                 for (int j = 0; j < cityArray.length(); j++) {
                                     JSONObject cityJson = cityArray.optJSONObject(j);
                                     String cityName = cityJson.optString("name");
                                     JSONArray countyArray = cityJson.optJSONArray("districts");
+                                    //
+                                    CityModel cityModel = new CityModel();
+                                    cityModel.setCityCode(cityJson.optString("citycode"));
+                                    cityModel.setAdCode(cityJson.optString("adcode"));
+                                    cityModel.setName(cityJson.optString("name"));
+                                    cityModel.setCenterPoint(cityJson.optString("center"));
+                                    cityModel.setLevel(cityJson.optString("level"));
+
+                                    ArrayList<CityModel> countyModels = new ArrayList<>();
                                     for (int k = 0; k < countyArray.length(); k++) {
                                         JSONObject countyJson = countyArray.optJSONObject(k);
                                         String countyName = countyJson.optString("name");
                                         String cityCode = countyJson.optString("citycode");
                                         String adcode = countyJson.optString("adcode");
-                                        CityModel cityModel = new CityModel();
-                                        cityModel.setProvince(province);
-                                        cityModel.setCity(cityName);
-                                        cityModel.setDistrict(countyName);
-                                        cityModel.setCityCode(cityCode);
-                                        cityModel.setAdCode(adcode);
-                                        MyApp.getLiteOrm().save(cityModel);
+                                        CityModel countyModel = new CityModel();
+                                        countyModel.setCityCode(countyJson.optString("citycode"));
+                                        countyModel.setAdCode(countyJson.optString("adcode"));
+                                        countyModel.setName(countyJson.optString("name"));
+                                        countyModel.setCenterPoint(countyJson.optString("center"));
+                                        countyModel.setLevel(countyJson.optString("level"));
+                                        countyModels.add(countyModel);
                                     }
+                                    cityModel.setDistricts(countyModels);
+                                    cityModels.add(cityModel);
                                 }
+                                provinceModel.setDistricts(cityModels);
+                                MyApp.getLiteOrm().save(provinceModel);//存入数据
                             }
                         }
                     } catch (IOException | JSONException e) {
@@ -137,13 +162,12 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                     }
                 }
                 List<CityModel> cityModels = MyApp.getLiteOrm().query(CityModel.class);
+                provinceModels = cityModels;
                 List<String> provinceList = new ArrayList<>(); //存放所有的省
                 for (int i = 0; i < cityModels.size(); i++) {
                     CityModel cityModel = cityModels.get(i);
-                    String province = cityModel.getProvince();
-                    if (!provinceList.contains(province)) {
-                        provinceList.add(province);
-                    }
+                    String province = cityModel.getName();
+                    provinceList.add(province);
                 }
                 return provinceList;
             }
@@ -165,17 +189,20 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
     /**
      * 用来存储当前选择了哪个省
      */
-    private String selectProvince;
+    private CityModel selectProvince;
+    /**
+     * 用来存储当前选择了哪个城市
+     */
+    private CityModel selectCity;
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent == provinceSp) {
-            String provinceName = provinceList.get(position);
-            selectProvince = provinceName;
-            loadCity(provinceName);
+            selectProvince = provinceModels.get(position);
+            loadCity(selectProvince);
         } else if (parent == citySp) {
-            String cityName = cityList.get(position);
-            loadCounty(selectProvince, cityName);
+            selectCity = mCityModels.get(position);
+            loadCounty(selectCity);
         }
     }
 
@@ -185,26 +212,18 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
     }
 
 
-    private void loadCounty(String province, String cityName) {
-        if (TextUtils.isEmpty(cityName)
-                | TextUtils.isEmpty(province)) {
+    private void loadCounty(final CityModel city) {
+        if (city == null) {
             return;
         }
         new AsyncTask<String, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(String... strings) {
-                String province = strings[0];
-                String city = strings[1];
-                //查询县的时候，要把省的名字和市的名字传过来。
-                QueryBuilder builder = new QueryBuilder(CityModel.class)
-                        .whereEquals(CityModel.COL_PROVINCE, province)
-                        .whereAppendAnd()
-                        .whereEquals(CityModel.COL_CITY, city);
-                List<CityModel> cityModels = MyApp.getLiteOrm().query(builder);
+                List<CityModel> cityModels = city.getDistricts();
                 List<String> countyList = new ArrayList<>(cityModels.size());
                 for (int i = 0; i < cityModels.size(); i++) {
                     CityModel cityModel = cityModels.get(i);
-                    countyList.add(cityModel.getDistrict());
+                    countyList.add(cityModel.getName());
                 }
                 return countyList;
             }
@@ -216,28 +235,29 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 countySp.setAdapter(adapter);
             }
-        }.execute(province, cityName);
+        }.execute();
 
     }
 
-
-    private void loadCity(String province) {
-        if (TextUtils.isEmpty(province)) {
+    /**
+     * 通过选择的省份加载城市
+     *
+     * @param province 某个省
+     */
+    private void loadCity(final CityModel province) {
+        if (province == null) {
             return;
         }
         new AsyncTask<String, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(String... voids) {
-                String province = voids[0];
-                QueryBuilder builder = new QueryBuilder<>(CityModel.class).whereEquals(CityModel.COL_PROVINCE, province);
-                List<CityModel> cityModels = MyApp.getLiteOrm().query(builder);
+                List<CityModel> cityModels = province.getDistricts();
+                mCityModels = cityModels;
                 List<String> cityList = new ArrayList<>();
                 for (int i = 0; i < cityModels.size(); i++) {
                     CityModel cityModel = cityModels.get(i);
-                    String cityName = cityModel.getCity();
-                    if (!cityList.contains(cityName)) {
-                        cityList.add(cityName);
-                    }
+                    String cityName = cityModel.getName();
+                    cityList.add(cityName);
                 }
                 return cityList;
             }
@@ -250,6 +270,6 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 citySp.setAdapter(adapter);
             }
-        }.execute(province);
+        }.execute();
     }
 }
