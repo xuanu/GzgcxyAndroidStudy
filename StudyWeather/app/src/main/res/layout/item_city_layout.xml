@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/item_city_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/weatherbg_rain_cloud"></ImageView>
+
+        <TextView
+            android:id="@+id/city_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:text="德江县"
+            android:textColor="#FFF"
+            android:textSize="16sp"></TextView>
+
+        <TextView
+            android:id="@+id/item_city_weather_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/city_name_tv"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="2dp"
+            android:text="19°阴"
+            android:textColor="#FFF"
+            android:textSize="16sp"></TextView>
+
+    </RelativeLayout>
+</FrameLayout>
