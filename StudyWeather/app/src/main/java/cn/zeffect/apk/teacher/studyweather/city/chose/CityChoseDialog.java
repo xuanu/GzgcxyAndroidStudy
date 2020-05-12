@@ -27,13 +27,16 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.fragment.app.DialogFragment;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import cn.zeffect.apk.teacher.studyweather.MyApp;
 import cn.zeffect.apk.teacher.studyweather.R;
 import cn.zeffect.apk.teacher.studyweather.city.bean.CityModel;
+import cn.zeffect.apk.teacher.studyweather.city.bean.UserCity;
 import okhttp3.Response;
 
-public class CityChoseDialog extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class CityChoseDialog extends AppCompatDialogFragment implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     @Override
     public void onStart() {
@@ -53,7 +56,8 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
     private Spinner provinceSp;
     private Spinner citySp, countySp;
     private List<CityModel> provinceModels; //用来存放所有的省市县
-    private List<CityModel> mCityModels;
+    private List<CityModel> mCityModels;    //所有市的
+    private List<CityModel> mCountyModel;
     private List<String> provinceList;
     private List<String> cityList;
 
@@ -67,18 +71,23 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
         countySp = view.findViewById(R.id.county_sp);
         provinceSp.setOnItemSelectedListener(this);
         citySp.setOnItemSelectedListener(this);
+        countySp.setOnItemSelectedListener(this);
+        view.findViewById(R.id.sure_btn).setOnClickListener(this);
         //
         new AsyncTask<Void, Void, List<String>>() {
-            private ProgressDialog dialog;
+            private SweetAlertDialog dialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 //创建一个等待框，用来显示 正在加载中……
-                dialog = new ProgressDialog(getContext());
-                dialog.setMessage("正在加载数据……");
-                dialog.setCancelable(false);
-                dialog.setCanceledOnTouchOutside(false);
+//                dialog = new ProgressDialog(getContext());
+//                dialog.setMessage("正在加载数据……");
+//                dialog.setCancelable(false);
+//                dialog.setCanceledOnTouchOutside(false);
+//                dialog.show();
+                dialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+                dialog.setContentText("正在加载……");
                 dialog.show();
             }
 
@@ -180,7 +189,7 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 provinceSp.setAdapter(adapter);
                 if (dialog != null) {
-                    dialog.cancel();
+                    dialog.dismiss();
                 }
             }
         }.execute();
@@ -195,6 +204,8 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
      */
     private CityModel selectCity;
 
+    private CityModel selectCounty; // 选择了哪个县
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent == provinceSp) {
@@ -203,6 +214,8 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
         } else if (parent == citySp) {
             selectCity = mCityModels.get(position);
             loadCounty(selectCity);
+        } else if (parent == countySp) {
+            selectCounty = mCountyModel.get(position);//这样我就知道用户选择了哪个城市
         }
     }
 
@@ -220,6 +233,7 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
             @Override
             protected List<String> doInBackground(String... strings) {
                 List<CityModel> cityModels = city.getDistricts();
+                mCountyModel = cityModels;
                 List<String> countyList = new ArrayList<>(cityModels.size());
                 for (int i = 0; i < cityModels.size(); i++) {
                     CityModel cityModel = cityModels.get(i);
@@ -271,5 +285,24 @@ public class CityChoseDialog extends DialogFragment implements AdapterView.OnIte
                 citySp.setAdapter(adapter);
             }
         }.execute();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.sure_btn) {
+            //手动选择城市之后，保存到数据。
+            if (selectCounty == null) {
+                return;
+            }
+            String adcode = selectCounty.getAdCode();
+            String cityName = selectCounty.getName();
+            UserCity userCity = new UserCity();
+            userCity.setCityname(cityName);
+            userCity.setAdcode(adcode);
+            userCity.setType(UserCity.TYPE_USER_ADD);
+            MyApp.getLiteOrm().save(userCity);
+            //
+            CityChoseDialog.this.dismiss();
+        }
     }
 }

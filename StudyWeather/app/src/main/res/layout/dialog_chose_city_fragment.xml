@@ -18,33 +18,68 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp">
 
-        <Spinner
-            android:id="@+id/province_sp"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="#191919"
-            android:spinnerMode="dialog"></Spinner>
+            android:background="@drawable/whiet_line_bg">
 
-        <Spinner
-            android:id="@+id/city_sp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:backgroundTint="#191919"
-            android:spinnerMode="dialog"></Spinner>
+            <Spinner
+                android:id="@+id/province_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#191919"
+                android:spinnerMode="dialog"></Spinner>
+        </FrameLayout>
 
-        <Spinner
-            android:id="@+id/county_sp"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="#191919"
-            android:spinnerMode="dialog"></Spinner>
+            android:background="@drawable/whiet_line_bg">
+
+            <Spinner
+                android:id="@+id/city_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#191919"
+                android:spinnerMode="dialog"></Spinner>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/whiet_line_bg">
+
+            <Spinner
+                android:id="@+id/county_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#191919"
+                android:spinnerMode="dialog"></Spinner>
+        </FrameLayout>
+
 
     </LinearLayout>
+
+
+    <views.zeffect.cn.darklib.DarkButton
+        android:id="@+id/sure_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/whiet_line_bg"
+        android:minHeight="0dp"
+        android:paddingLeft="24dp"
+        android:paddingTop="8dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="8dp"
+        android:text="确定"
+        android:textColor="#191919"></views.zeffect.cn.darklib.DarkButton>
 
 </LinearLayout>

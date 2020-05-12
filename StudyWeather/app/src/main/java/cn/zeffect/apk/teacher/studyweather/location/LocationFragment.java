@@ -23,6 +23,8 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.litesuits.orm.db.assit.QueryBuilder;
+import com.litesuits.orm.db.assit.WhereBuilder;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -40,8 +42,10 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import cn.zeffect.apk.teacher.studyweather.MainActivity;
+import cn.zeffect.apk.teacher.studyweather.MyApp;
 import cn.zeffect.apk.teacher.studyweather.R;
 import cn.zeffect.apk.teacher.studyweather.bean.Weather;
+import cn.zeffect.apk.teacher.studyweather.city.bean.UserCity;
 import cn.zeffect.apk.teacher.studyweather.utils.FileIOandOperation;
 import cn.zeffect.apk.teacher.studyweather.utils.SpUtils;
 import okhttp3.Call;
@@ -160,6 +164,21 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                     adcode = aMapLocation.getAdCode();
                     SpUtils.put(getContext(), SP_AD_CODE_KEY, adcode);
                     SpUtils.put(getContext(), SP_CITY_NAME_KEY, aMapLocation.getDistrict());
+                    //存入定位城市,先检查有没有定位城市
+                    QueryBuilder builder = new QueryBuilder(UserCity.class).whereEquals(UserCity.COL_TYPE, UserCity.TYPE_LOCATION);
+                    long locationCount = MyApp.getLiteOrm().queryCount(builder);
+                    if (locationCount > 0) {
+                        //代表已经定位，删除旧的定位城市。
+                        WhereBuilder whereBuilder = new WhereBuilder(UserCity.class).andEquals(UserCity.COL_TYPE, UserCity.TYPE_LOCATION);
+                        MyApp.getLiteOrm().delete(whereBuilder);
+                    }
+                    //把新的定位城市保存下来
+                    UserCity locationCity = new UserCity();
+                    locationCity.setAdcode(adcode);
+                    locationCity.setCityname(aMapLocation.getDistrict());
+                    locationCity.setType(UserCity.TYPE_LOCATION);
+                    MyApp.getLiteOrm().save(locationCity);
+                    //
                     getWeather(aMapLocation.getAdCode());//调用获取天气的方法
                     if (aMapLocationClient != null) {
                         aMapLocationClient.stopLocation();
@@ -186,7 +205,6 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
             aMapLocationClient.startLocation();
         }
     }
-
 
 
     @Override

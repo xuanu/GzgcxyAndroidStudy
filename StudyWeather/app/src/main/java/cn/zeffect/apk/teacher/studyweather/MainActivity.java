@@ -67,10 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pager = findViewById(R.id.view_pager);
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new LocationFragment());
-        fragments.add(new WeatherFragment().setCityCode("520625").setCityName("印江土家族苗族自治县"));
-        fragments.add(new WeatherFragment().setCityCode("520627").setCityName("沿河土家族自治县"));
-        fragments.add(new WeatherFragment().setCityCode("520628").setCityName("松桃苗族自治县"));
-        fragments.add(new WeatherFragment().setCityCode("520624").setCityName("思南县"));
         WeatherAdapter adapter = new WeatherAdapter(getSupportFragmentManager(), fragments);
         pager.setAdapter(adapter);
         //

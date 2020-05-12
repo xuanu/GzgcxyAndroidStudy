@@ -44,4 +44,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:3.3.1") //OkHttp
 
     implementation 'com.github.xuanu:DarkViews:v1.3'
+    implementation 'cn.pedant.sweetalert:library:1.3'
 }
