@@ -8,15 +8,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:background="@drawable/item_city_bg"
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/item_bg_img"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/weatherbg_rain_cloud"></ImageView>
+            android:src="@drawable/widget_bkg_overcast"></ImageView>
 
         <TextView
             android:id="@+id/city_name_tv"

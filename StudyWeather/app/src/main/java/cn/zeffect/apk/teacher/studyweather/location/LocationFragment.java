@@ -464,6 +464,14 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                     String adcode = liveJson.optString("adcode");
                     String weather = liveJson.optString("weather");
                     String temperature = liveJson.optString("temperature");
+                    //
+                    UserCity userCity = MyApp.getLiteOrm().queryById(adcode, UserCity.class);
+                    if (userCity != null) {
+                        userCity.setTemp(temperature);
+                        userCity.setWeather(weather);
+                        MyApp.getLiteOrm().save(userCity);
+                    }
+                    //
                     String winddirection = liveJson.optString("winddirection");
                     String windpower = liveJson.optString("windpower");
                     String humidity = liveJson.optString("humidity");

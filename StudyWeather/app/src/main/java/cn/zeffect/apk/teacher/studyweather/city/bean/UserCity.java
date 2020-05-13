@@ -13,9 +13,12 @@ public class UserCity implements Serializable {
     public static final String COL_CITY_MODEL = "city";
     public static final String COL_CITY_NAME = "cityname";
     public static final String COL_TYPE = "type";
+    public static final String COL_WEATHER = "weather";
+    public static final String COL_TEMP = "temp";
     //
     public static final String TYPE_LOCATION = "location";
     public static final String TYPE_USER_ADD = "user_add";
+
     //
     @Column(COL_AD_CODE)
     @PrimaryKey(AssignType.BY_MYSELF)
@@ -24,7 +27,35 @@ public class UserCity implements Serializable {
     private String cityname;
     @Column(COL_TYPE)
     private String type;
+    @Column(COL_WEATHER)
+    private String weather;
+    @Column(COL_TEMP)
+    private String temp;
 
+
+    public String getWeather() {
+        if (weather == null) {
+            weather = "";
+        }
+        return weather;
+    }
+
+    public UserCity setWeather(String weather) {
+        this.weather = weather;
+        return this;
+    }
+
+    public String getTemp() {
+        if (temp == null) {
+            temp = "";
+        }
+        return temp;
+    }
+
+    public UserCity setTemp(String temp) {
+        this.temp = temp;
+        return this;
+    }
 
     public String getAdcode() {
         return adcode;

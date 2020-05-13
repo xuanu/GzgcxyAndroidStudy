@@ -39,8 +39,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import cn.zeffect.apk.teacher.studyweather.MyApp;
 import cn.zeffect.apk.teacher.studyweather.R;
 import cn.zeffect.apk.teacher.studyweather.bean.Weather;
+import cn.zeffect.apk.teacher.studyweather.city.bean.UserCity;
 import cn.zeffect.apk.teacher.studyweather.utils.FileIOandOperation;
 import cn.zeffect.apk.teacher.studyweather.utils.SpUtils;
 import okhttp3.Call;
@@ -376,6 +378,14 @@ public class WeatherFragment extends Fragment implements View.OnClickListener {
                     String adcode = liveJson.optString("adcode");
                     String weather = liveJson.optString("weather");
                     String temperature = liveJson.optString("temperature");
+                    //
+                    UserCity userCity = MyApp.getLiteOrm().queryById(adcode, UserCity.class);
+                    if (userCity != null) {
+                        userCity.setTemp(temperature);
+                        userCity.setWeather(weather);
+                        MyApp.getLiteOrm().save(userCity);
+                    }
+                    //
                     String winddirection = liveJson.optString("winddirection");
                     String windpower = liveJson.optString("windpower");
                     String humidity = liveJson.optString("humidity");

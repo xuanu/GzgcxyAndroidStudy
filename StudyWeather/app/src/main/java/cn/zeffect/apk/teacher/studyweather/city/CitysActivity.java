@@ -19,6 +19,8 @@ import cn.zeffect.apk.teacher.studyweather.city.chose.CityChoseDialog;
 public class CitysActivity extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView cityRecy;
+    List<UserCity> cityList;
+    CityAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,17 +34,30 @@ public class CitysActivity extends AppCompatActivity implements View.OnClickList
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         cityRecy.setLayoutManager(layoutManager);
         //2. 设置adapter
-        List<UserCity> cityList = MyApp.getLiteOrm().query(UserCity.class);
-        CityAdapter adapter = new CityAdapter(cityList);
+        cityList = MyApp.getLiteOrm().query(UserCity.class);
+        adapter = new CityAdapter(cityList);
         cityRecy.setAdapter(adapter);
         //3. 可以优化
         cityRecy.setHasFixedSize(true);
+        //
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.add_city_img) {
-            new CityChoseDialog().show(getSupportFragmentManager(), CityChoseDialog.class.getName());
+            new CityChoseDialog()
+                    .setAddListener(new CityChoseDialog.AddListener() {
+                        @Override
+                        public void add(String adcode, String cityname) {
+                            UserCity userCity = new UserCity();
+                            userCity.setAdcode(adcode);
+                            userCity.setCityname(cityname);
+                            userCity.setType(UserCity.TYPE_USER_ADD);
+                            cityList.add(userCity);
+                            adapter.notifyItemInserted(cityList.size() - 1);
+                        }
+                    })
+                    .show(getSupportFragmentManager(), CityChoseDialog.class.getName());
         } else if (v.getId() == R.id.back_btn) {
             this.finish();
         }

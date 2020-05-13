@@ -38,6 +38,18 @@ import okhttp3.Response;
 
 public class CityChoseDialog extends AppCompatDialogFragment implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
+    private AddListener addListener;
+
+    public CityChoseDialog setAddListener(AddListener addListener) {
+        this.addListener = addListener;
+        return this;
+    }
+
+    public interface AddListener {
+        void add(String adcode, String cityname);
+    }
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -302,6 +314,9 @@ public class CityChoseDialog extends AppCompatDialogFragment implements AdapterV
             userCity.setType(UserCity.TYPE_USER_ADD);
             MyApp.getLiteOrm().save(userCity);
             //
+            if (addListener != null) {
+                addListener.add(adcode, cityName);
+            }
             CityChoseDialog.this.dismiss();
         }
     }

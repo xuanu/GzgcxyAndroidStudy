@@ -12,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import cn.zeffect.apk.teacher.studyweather.bean.Weather;
 import cn.zeffect.apk.teacher.studyweather.city.CitysActivity;
+import cn.zeffect.apk.teacher.studyweather.city.bean.UserCity;
 import cn.zeffect.apk.teacher.studyweather.location.LocationFragment;
 import cn.zeffect.apk.teacher.studyweather.location.WeatherFragment;
 import cn.zeffect.apk.teacher.studyweather.utils.FileIOandOperation;
@@ -66,9 +67,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //
         pager = findViewById(R.id.view_pager);
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new LocationFragment());
+        fragments.add(new LocationFragment());//定位城市
+        List<UserCity> cityList = MyApp.getLiteOrm().query(UserCity.class);
+        for (int i = 0; i < cityList.size(); i++) {
+            UserCity userCity = cityList.get(i);
+            if (!userCity.getType().equals(UserCity.TYPE_LOCATION)) {
+                fragments.add(new WeatherFragment().setCityName(userCity.getCityname()).setCityCode(userCity.getAdcode()));
+            }
+        }
         WeatherAdapter adapter = new WeatherAdapter(getSupportFragmentManager(), fragments);
         pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(cityList.size());
         //
         findViewById(R.id.sel_city_img).setOnClickListener(this);
     }
