@@ -15,6 +15,17 @@ import cn.zeffect.apk.teacher.studyweather.city.bean.UserCity;
 
 public class CityAdapter extends RecyclerView.Adapter<CityAdapter.MyViewHolder> {
 
+    private AdapterListener adapterListener;
+
+    public interface AdapterListener {
+        void onLongClick(int position);
+    }
+
+    public CityAdapter setAdapterListener(AdapterListener adapterListener) {
+        this.adapterListener = adapterListener;
+        return this;
+    }
+
     private List<UserCity> cities; //用来存入所有的城市
 
     public CityAdapter(List<UserCity> tmpCitys) {
@@ -29,8 +40,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        UserCity city = cities.get(position);
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+        final UserCity city = cities.get(position);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //长按事件
+                if (adapterListener != null) {
+                    adapterListener.onLongClick(position);
+                }
+                return true;
+            }
+        });
+        //
+
         holder.cityTv.setText(city.getCityname());
         holder.weatherTv.setText(city.getTemp() + "°" + city.getWeather());
         //接下来是背景图的变化了
