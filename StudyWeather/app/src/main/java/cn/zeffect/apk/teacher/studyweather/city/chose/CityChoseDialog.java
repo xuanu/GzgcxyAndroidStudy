@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -307,6 +308,12 @@ public class CityChoseDialog extends AppCompatDialogFragment implements AdapterV
                 return;
             }
             String adcode = selectCounty.getAdCode();
+            //检查数据库是否存在相同的城市
+            UserCity ormCity = MyApp.getLiteOrm().queryById(adcode, UserCity.class);
+            if (ormCity != null) {
+                Toast.makeText(getContext(), "已存在相同的城市！", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String cityName = selectCounty.getName();
             UserCity userCity = new UserCity();
             userCity.setCityname(cityName);
